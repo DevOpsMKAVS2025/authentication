@@ -4,8 +4,6 @@ using Auth.Exceptions;
 using Auth.Repository;
 using Auth.Security;
 using Microsoft.AspNetCore.Identity;
-using StackExchange.Redis;
-using System.Text.Json;
 
 namespace Auth.Services
 {
@@ -15,17 +13,14 @@ namespace Auth.Services
         private readonly IPasswordHasher<string> _passwordHasher;
         private readonly IJwtHelper _jwtHelper;
         private readonly ILogger<AuthService> _logger;
-        private readonly IConnectionMultiplexer _redis;
 
         public AuthService(IUserRepository userRepository, IJwtHelper jwtHelper,
-            IPasswordHasher<string> passwordHasher, ILogger<AuthService> logger,
-            IConnectionMultiplexer redis)
+            IPasswordHasher<string> passwordHasher, ILogger<AuthService> logger)
         {
             _userRepository = userRepository;
             _jwtHelper = jwtHelper;
             _passwordHasher = passwordHasher;
             _logger = logger;
-            _redis = redis;
         }
 
         public async Task<Tokens> Login(LoginCredentialsDto credentials)
@@ -50,37 +45,8 @@ namespace Auth.Services
 
             Tokens response = new Tokens{
                 AccessToken = token,
-                RefreshToken = token,
             };
             return response;
-        }
-
-        private async Task<Object> GenerateRefreshToken()
-        {
-            string token = AuthService.GenerateRandomString(128);
-            string hashedToken = _passwordHasher.HashPassword(String.Empty, token);
-            var expiration = DateTime.Now.AddDays(7);
-            string tokenId = Guid.NewGuid().ToString();
-
-            var db = _redis.GetDatabase();
-            string key = $"refresh_token:{tokenId}";
-
-            await db.StringSetAsync(key, token, TimeSpan.FromDays(7));
-
-            return new
-            {
-                Id = tokenId,
-                Token = token,
-                ExpiresAt = expiration
-            };
-        }
-
-        private static string GenerateRandomString(int length)
-        {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            var random = new Random();
-            return new string(Enumerable.Repeat(chars, length)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
         }
     }
 }

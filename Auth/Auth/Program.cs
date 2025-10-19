@@ -9,22 +9,14 @@ using Auth.Data;
 using Microsoft.EntityFrameworkCore;
 using Auth.Repository;
 using Auth.Services;
+using Auth.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Configuration.AddEnvironmentVariables();
 
 
 builder.Services.AddScoped<IPasswordHasher<string>, BCryptPasswordHasher>();
 builder.Services.AddSingleton<IJwtHelper, JwtHelper>();
-
-
-builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
-{
-    var configuration = builder.Configuration.GetConnectionString("Redis")!;
-    return ConnectionMultiplexer.Connect(configuration);
-});
-builder.Services.AddDbContext<DataContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
-
 
 var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
@@ -74,8 +66,23 @@ builder.Services.AddCors(options =>
                       });
 });
 
+builder.Services.AddDbContext<DataContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
+
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<GlobalExceptionHandler>();
+});
+
+var port = builder.Configuration["Port"] ?? "5156";
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(int.Parse(port));
+});
 
 var app = builder.Build();
 
