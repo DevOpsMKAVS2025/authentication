@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Auth.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20251019131822_InitialCreate")]
+    [Migration("20251020202734_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -25,7 +25,7 @@ namespace Auth.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Auth.Models.User", b =>
+            modelBuilder.Entity("Auth.Model.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -59,6 +59,9 @@ namespace Auth.Migrations
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("UserType")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Username")
                         .IsRequired()

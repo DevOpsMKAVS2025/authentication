@@ -1,5 +1,7 @@
 ﻿
-namespace Auth.Models
+using Auth.Model;
+
+namespace Auth.Model
 {
     public class User : BaseEntity
     {
@@ -10,5 +12,6 @@ namespace Auth.Models
         public required string Address { get; set; }
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
+        public required UserType UserType { get; set; }
 	}
 }

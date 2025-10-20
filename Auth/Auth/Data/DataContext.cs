@@ -1,4 +1,4 @@
-﻿using Auth.Models;
+﻿using Auth.Model;
 using Microsoft.EntityFrameworkCore;
 
 

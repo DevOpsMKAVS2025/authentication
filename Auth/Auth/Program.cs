@@ -71,6 +71,7 @@ builder.Services.AddDbContext<DataContext>(opt => opt.UseNpgsql(builder.Configur
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddControllers();
 builder.Services.AddControllers(options =>
