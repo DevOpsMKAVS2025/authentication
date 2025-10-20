@@ -53,5 +53,34 @@ namespace Auth.Services
                 Username = newUser.Username,
             };
         }
+
+        public async Task updateProperty(Guid accountId, string property, string value)
+        {
+            User? user = await _userRepository.Get(accountId);
+
+            switch (property)
+            {
+                case "firstName":
+                    user!.FirstName = value;
+                    break;
+
+                case "lastName":
+                    user!.LastName = value;
+                    break;
+
+                case "address":
+                    user!.Address = value;
+                    break;
+
+                case "password":
+                    user!.Password = _passwordHasher.HashPassword(string.Empty, value);
+                    break;
+                default:
+                    throw new BadRequestException("Invalid property");
+            }
+
+            await _userRepository.Update(user);
+
+        } 
     }
 }

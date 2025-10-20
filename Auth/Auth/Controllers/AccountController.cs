@@ -2,6 +2,7 @@
 using Auth.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Auth.Controllers
 {
@@ -20,6 +21,16 @@ namespace Auth.Controllers
         {
             var response = await _userService.createAccount(accountDto);
             return Ok(response);
+        }
+
+        [HttpPut("")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProperty([FromBody] UpdateValueDto valueDto)
+        {
+            string principalId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            await _userService.updateProperty(Guid.Parse(principalId), valueDto.Property, valueDto.Value);
+
+            return NoContent();
         }
     }
 }
