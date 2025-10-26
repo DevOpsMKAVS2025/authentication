@@ -39,7 +39,7 @@ namespace Auth.Services
                 throw new UnauthorizedException("Wrong email or password");
             }
 
-            var token = _jwtHelper.GenerateToken(user.GetType().Name, user.Id.ToString(), user.Email, user.Username);
+            var token = _jwtHelper.GenerateToken(user.UserType.ToString(), user.Id.ToString(), user.Email, user.Username);
 
             _logger.LogInformation("User {Email} has successfully logged in.", credentials.Email);
 
