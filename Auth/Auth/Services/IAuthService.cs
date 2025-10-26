@@ -1,5 +1,5 @@
 ﻿using Auth.Dto;
-using Auth.Models;
+using Auth.Model;
 
 namespace Auth.Services
 {

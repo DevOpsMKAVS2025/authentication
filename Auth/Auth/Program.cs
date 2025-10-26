@@ -1,6 +1,5 @@
 using Auth.Security;
 using Microsoft.AspNetCore.Identity;
-using StackExchange.Redis;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -71,6 +70,7 @@ builder.Services.AddDbContext<DataContext>(opt => opt.UseNpgsql(builder.Configur
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddControllers();
 builder.Services.AddControllers(options =>
@@ -87,11 +87,11 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 var app = builder.Build();
 
 
+app.UseCors("CORS_CONFIG");
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseCors("CORS_CONFIG");
 
 app.MapControllers();
 

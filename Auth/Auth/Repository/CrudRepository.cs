@@ -1,5 +1,5 @@
 ﻿using Auth.Data;
-using Auth.Models;
+using Auth.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Repository

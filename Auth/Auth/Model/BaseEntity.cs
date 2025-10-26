@@ -1,4 +1,4 @@
-﻿namespace Auth.Models
+﻿namespace Auth.Model
 {
     public abstract class BaseEntity
     {
