@@ -1,0 +1,39 @@
+name: Build And Push Docker
+
+on:
+  workflow_call:
+    inputs:
+      image-tag:
+        description: "Docker image tag"
+        required: true
+        type: string
+      local-path:
+        description: "Path to the directory containing Dockerfile"
+        required: true
+        type: string
+      semantic-version:
+        description: "Docker semantic version tag"
+        required: true
+        type: string
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR source branch
+        uses: actions/checkout@v4
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROJECT_NAME }}:${{ inputs.image-tag }} ${{ inputs.local-path }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROJECT_NAME }}:${{ inputs.image-tag }}
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROJECT_NAME }}:${{ inputs.semantic-version }} ${{ inputs.local-path }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROJECT_NAME }}:${{ inputs.semantic-version }}
