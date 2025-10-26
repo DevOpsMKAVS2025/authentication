@@ -1,4 +1,4 @@
-namespace Auth.Test
+namespace Auth.Tests
 {
 	public class UnitTest1
 	{
