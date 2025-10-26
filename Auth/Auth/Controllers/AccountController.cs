@@ -32,5 +32,25 @@ namespace Auth.Controllers
 
             return NoContent();
         }
+
+        [HttpGet("")]
+        [Authorize]
+        public async Task<IActionResult> GetAccountInformation()
+        {
+            string principalId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var response = await _userService.GetAccountInformation(Guid.Parse(principalId));
+            return Ok(response);
+        }
+
+        [HttpDelete("")]
+        [Authorize]
+        public async Task<IActionResult> DeleteAccount()
+        {
+            //string principalId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            //await _userService.updateProperty(Guid.Parse(principalId), valueDto.Property, valueDto.Value);
+
+            //return NoContent();
+            return NoContent();
+        }
     }
 }

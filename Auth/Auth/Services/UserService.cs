@@ -82,5 +82,33 @@ namespace Auth.Services
             await _userRepository.Update(user);
 
         } 
+
+        public async Task<AccountResponse> GetAccountInformation(Guid principaId)
+        {
+            User user = (await _userRepository.Get(principaId))!;
+            return new AccountResponse
+            {
+                Id = user.Id.ToString(),
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Address = user.Address,
+                Email = user.Email,
+                Username = user.Username,
+            };
+        }
+
+        public async Task deleteAccount(Guid principaId)
+        {
+            User user = (await _userRepository.Get(principaId))!;
+
+            if(user.UserType == UserType.Host)
+            {
+
+            }
+            else if (user.UserType == UserType.Guest)
+            {
+
+            }
+        }
     }
 }
