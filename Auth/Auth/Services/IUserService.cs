@@ -7,5 +7,6 @@ namespace Auth.Services
         Task<AccountResponse> createAccount(CreateAccountDto accountDto);
         Task updateProperty(Guid accountId, string property, string value);
         Task<AccountResponse> GetAccountInformation(Guid principaId);
+        Task DeleteAccount(Guid principalId);
     }
 }

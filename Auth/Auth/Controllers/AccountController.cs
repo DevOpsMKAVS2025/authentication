@@ -46,10 +46,8 @@ namespace Auth.Controllers
         [Authorize]
         public async Task<IActionResult> DeleteAccount()
         {
-            //string principalId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            //await _userService.updateProperty(Guid.Parse(principalId), valueDto.Property, valueDto.Value);
-
-            //return NoContent();
+            string principalId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            await _userService.DeleteAccount(Guid.Parse(principalId));
             return NoContent();
         }
     }

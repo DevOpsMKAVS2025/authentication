@@ -10,10 +10,12 @@ namespace Auth.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IPasswordHasher<string> _passwordHasher;
-        public UserService(IUserRepository userRepository, IPasswordHasher<string> passwordHasher)
+        private readonly string _bookingServiceUrl;
+        public UserService(IUserRepository userRepository, IPasswordHasher<string> passwordHasher, IConfiguration configuration)
         {
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
+            _bookingServiceUrl = configuration["OtherApp:BaseUrl"]!;
         }
 
         public async Task<AccountResponse> createAccount(CreateAccountDto accountDto)
@@ -97,18 +99,32 @@ namespace Auth.Services
             };
         }
 
-        public async Task deleteAccount(Guid principaId)
+        public async Task DeleteAccount(Guid principalId)
         {
-            User user = (await _userRepository.Get(principaId))!;
+            User user = (await _userRepository.Get(principalId))!;
 
-            if(user.UserType == UserType.Host)
+            bool isOwner = user.UserType == UserType.Host;
+
+            string url = $"_bookingServiceUrl/api/requests/user/{principalId}/has-reservations?isOwner={isOwner}";
+
+            using var httpClient = new HttpClient();
+            var response = await httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            string responseText = await response.Content.ReadAsStringAsync();
+            bool hasReservations = bool.Parse(responseText);
+
+            if (hasReservations)
             {
-
+                throw new BadRequestException("Cannot delete account: user has reservations.");
             }
-            else if (user.UserType == UserType.Guest)
-            {
 
-            }
+            await _userRepository.Delete(principalId);
+
+            url = $"_bookingServiceUrl/api/accommodation/owner/{principalId}/";
+            response = await httpClient.DeleteAsync(url);
+            response.EnsureSuccessStatusCode();
+
         }
     }
 }
