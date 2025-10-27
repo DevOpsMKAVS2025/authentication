@@ -15,7 +15,7 @@ namespace Auth.Services
         {
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
-            _bookingServiceUrl = configuration["OtherApp:BaseUrl"]!;
+            _bookingServiceUrl = configuration["BookingServiceUrl"]!;
         }
 
         public async Task<AccountResponse> createAccount(CreateAccountDto accountDto)
@@ -105,7 +105,7 @@ namespace Auth.Services
 
             bool isOwner = user.UserType == UserType.Host;
 
-            string url = $"_bookingServiceUrl/api/requests/user/{principalId}/has-reservations?isOwner={isOwner}";
+            string url = $"{_bookingServiceUrl}/api/request/user/{principalId}/has-reservations?isOwner={isOwner}";
 
             using var httpClient = new HttpClient();
             var response = await httpClient.GetAsync(url);
@@ -121,9 +121,12 @@ namespace Auth.Services
 
             await _userRepository.Delete(principalId);
 
-            url = $"_bookingServiceUrl/api/accommodation/owner/{principalId}/";
-            response = await httpClient.DeleteAsync(url);
-            response.EnsureSuccessStatusCode();
+            if (isOwner)
+            {
+                url = $"{_bookingServiceUrl}/api/accommodation/owner/{principalId}/";
+                response = await httpClient.DeleteAsync(url);
+                response.EnsureSuccessStatusCode();
+            }
 
         }
     }
