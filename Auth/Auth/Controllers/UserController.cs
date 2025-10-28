@@ -16,7 +16,7 @@ namespace Auth.Controllers
         }
 
         [HttpGet("/{id}")]
-        [AllowAnonymous]
+        [Authorize]
         public async Task<IActionResult> GetUser(Guid id)
         {
             var response = await _userService.GetUserById(id);
