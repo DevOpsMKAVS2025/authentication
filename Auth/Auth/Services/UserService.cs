@@ -56,7 +56,7 @@ namespace Auth.Services
             };
         }
 
-        public async Task updateProperty(Guid accountId, string property, string value)
+        public async Task UpdateProperty(Guid accountId, string property, string value)
         {
             User? user = await _userRepository.Get(accountId);
 
