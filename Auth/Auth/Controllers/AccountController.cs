@@ -28,7 +28,7 @@ namespace Auth.Controllers
         public async Task<IActionResult> UpdateProperty([FromBody] UpdateValueDto valueDto)
         {
             string principalId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            await _userService.updateProperty(Guid.Parse(principalId), valueDto.Property, valueDto.Value);
+            await _userService.UpdateProperty(Guid.Parse(principalId), valueDto.Property, valueDto.Value);
 
             return NoContent();
         }

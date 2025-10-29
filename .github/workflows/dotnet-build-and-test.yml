@@ -51,14 +51,14 @@ jobs:
       run: dotnet restore ./Auth/Auth
 
     - name: Restore dependencies for test project
-      run: dotnet restore ./Auth/Auth.Tests
+      run: dotnet restore ./Auth/AuthTests
 
     - name: Build default project
       run: dotnet build ./Auth/Auth --no-restore
 
     - name: Run tests with coverage
       run: |
-        dotnet test ./Auth/Auth.Tests \
+        dotnet test ./Auth/AuthTests \
           --verbosity normal \
           --logger "trx;LogFileName=TestResults.trx" \
           /p:CollectCoverage=true \
