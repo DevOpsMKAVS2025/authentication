@@ -1,0 +1,67 @@
+name: Build And Test .NET
+
+on:
+  workflow_call:
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: admin
+          POSTGRES_DB: uks-database
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U admin" 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 5
+          
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Wait for PostgreSQL
+      run: |
+        for i in {1..10}; do
+          nc -zv localhost 5432 && break
+          echo "Waiting for PostgreSQL..."
+          sleep 5
+        done      
+
+    - name: Create and clone test database
+      env:
+        PGPASSWORD: admin
+      run: |
+        echo "Creating test-uks-database..."
+        psql -h localhost -U admin -d postgres -c "CREATE DATABASE \"test-uks-database\";"
+        echo "Cloning uks-database to test-uks-database..."
+        pg_dump -h localhost -U admin -d uks-database | psql -h localhost -U admin -d test-uks-database
+
+    - name: Restore dependencies for default project
+      run: dotnet restore ./Auth/Auth
+
+    - name: Restore dependencies for test project
+      run: dotnet restore ./Auth/Auth.Tests
+
+    - name: Build default project
+      run: dotnet build ./Auth/Auth --no-restore
+
+    - name: Run tests with coverage
+      run: |
+        dotnet test ./Auth/Auth.Tests \
+          --verbosity normal \
+          --logger "trx;LogFileName=TestResults.trx" \
+          /p:CollectCoverage=true \
+          /p:CoverletOutputFormat=cobertura \
+          /p:CoverletOutput=./TestResults/coverage.xml
+
