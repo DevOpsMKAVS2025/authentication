@@ -1,0 +1,52 @@
+name: Build and Push .NET App
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  build-and-test:
+    uses: ./.github/workflows/dotnet-build-and-test.yml
+  prepare-tag:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.extract_tag.outputs.TAG }}
+      semantic_tag: ${{ steps.semantic_version.outputs.TAG }}
+    steps:
+      - name: Get commit hash
+        id: extract_tag
+        run: |
+          echo "Tag=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Get semantic version
+        id: semantic_version
+        run: |
+          VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          PATCH=$(echo $VERSION | awk -F. '{print $3+1}')
+          NEW_TAG=$(echo $VERSION | awk -F. '{print $1"."$2"."}' )$PATCH
+          echo "TAG=${NEW_TAG}" >> $GITHUB_OUTPUT
+
+  build-and-push:
+    needs: prepare-tag
+    uses: ./.github/workflows/build-and-push-docker.yml
+    with:
+      image-tag: ${{ needs.prepare-tag.outputs.tag }}
+      local-path: ./Auth/Auth
+      semantic-version: ${{ needs.prepare-tag.outputs.semantic_tag }}
+    secrets: inherit
