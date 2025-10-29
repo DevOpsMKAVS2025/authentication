@@ -8,5 +8,7 @@ namespace Auth.Services
         Task UpdateProperty(Guid accountId, string property, string value);
         Task<AccountResponse> GetAccountInformation(Guid principaId);
         Task DeleteAccount(Guid principalId);
+        Task<IEnumerable<AccountResponse>> GetAllUsers();
+        Task<AccountResponse> GetUserById(Guid id);
     }
 }

@@ -129,5 +129,38 @@ namespace Auth.Services
             }
 
         }
+
+        public async Task<IEnumerable<AccountResponse>> GetAllUsers()
+        {
+            var users = await _userRepository.GetAll();
+
+            return users.Select(user => new AccountResponse
+            {
+                Id = user.Id.ToString(),
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Address = user.Address,
+                Email = user.Email,
+                Username = user.Username
+            });
+        }
+
+        public async Task<AccountResponse> GetUserById(Guid id)
+        {
+            var user = await _userRepository.Get(id);
+
+            if (user == null)
+                throw new NotFoundException("User not found");
+
+            return new AccountResponse
+            {
+                Id = user.Id.ToString(),
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Address = user.Address,
+                Email = user.Email,
+                Username = user.Username
+            };
+        }
     }
 }
