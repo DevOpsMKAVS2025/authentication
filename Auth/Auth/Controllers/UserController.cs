@@ -15,7 +15,7 @@ namespace Auth.Controllers
             _userService = userService;
         }
 
-        [HttpGet("/{id}")]
+        [HttpGet("{id}")]
         [Authorize]
         public async Task<IActionResult> GetUser(Guid id)
         {
