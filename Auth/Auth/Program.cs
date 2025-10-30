@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Auth.Repository;
 using Auth.Services;
 using Auth.Filters;
+using Auth.Startup;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
@@ -19,6 +20,7 @@ builder.Services.AddSingleton<IJwtHelper, JwtHelper>();
 
 var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+var applyMigrations = builder.Configuration["Database:ApplyMigrations"] == "true";
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -85,6 +87,7 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 });
 
 var app = builder.Build();
+if (applyMigrations) app.ApplyMigrations();
 
 
 app.UseCors("CORS_CONFIG");
