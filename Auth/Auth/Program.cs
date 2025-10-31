@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Auth.Repository;
 using Auth.Services;
 using Auth.Filters;
-using Auth.Startup;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
